@@ -77,8 +77,8 @@ def demo_save_video():
     cfg = get_auto_cfg(model_path, config_file)
     demo = VisualizationDemo(cfg)
 
-    video_input = "/home/chli/videos/robot-2.mp4"
-    output = "/home/chli/videos/robot-2_semantic.mp4"
+    video_input = "/home/chli/videos/robot-3.mp4"
+    output = "/home/chli/videos/robot-3_semantic.mp4"
     video = cv2.VideoCapture(video_input)
     width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -102,5 +102,5 @@ def demo_save_video():
     return True
 
 if __name__ == "__main__":
-    demo_detect_video()
+    demo_save_video()
 
