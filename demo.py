@@ -26,15 +26,27 @@ def demo_detect_image():
     demo = VisualizationDemo(cfg)
 
     path = "/home/chli/baidu/car_dataset/images/1.jpg"
-    out_filename = "/home/chli/baidu/test.jpg"
     img = cv2.imread(path)
-    predictions, visualized_output = demo.run_on_image(img)
-    visualized_output.save(out_filename)
+    _, visualized_output = demo.run_on_image(img)
     basename = os.path.basename(path)
     cv2.namedWindow(basename, cv2.WINDOW_NORMAL)
     cv2.imshow(basename, visualized_output.get_image()[:, :, ::-1])
     if cv2.waitKey(0) == 27:
         return True # esc to quit
+    return True
+
+def demo_save_image():
+    model_path = "/home/chli/.ros/model_final_a3ec72.pkl"
+    config_file = "/home/chli/.ros/configs/COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml"
+
+    cfg = get_auto_cfg(model_path, config_file)
+    demo = VisualizationDemo(cfg)
+
+    path = "/home/chli/baidu/car_dataset/images/1.jpg"
+    out_filename = "/home/chli/baidu/test.jpg"
+    img = cv2.imread(path)
+    _, visualized_output = demo.run_on_image(img)
+    visualized_output.save(out_filename)
     return True
 
 def demo_detect_video():
@@ -44,20 +56,38 @@ def demo_detect_video():
     cfg = get_auto_cfg(model_path, config_file)
     demo = VisualizationDemo(cfg)
 
-    video_input = "/home/chli/videos/robot-1.mp4"
-    output = "/home/chli/videos/robot-1_semantic.mp4"
+    video_input = "/home/chli/videos/robot-2.mp4"
+    video = cv2.VideoCapture(video_input)
+    num_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+    basename = os.path.basename(video_input)
+    assert os.path.isfile(video_input)
+    for vis_frame in tqdm.tqdm(demo.run_on_video(video), total=num_frames):
+        cv2.namedWindow(basename, cv2.WINDOW_NORMAL)
+        cv2.imshow(basename, vis_frame)
+        if cv2.waitKey(1) == 27:
+            break  # esc to quit
+    video.release()
+    cv2.destroyAllWindows()
+    return True
+
+def demo_save_video():
+    model_path = "/home/chli/.ros/model_final_a3ec72.pkl"
+    config_file = "/home/chli/.ros/configs/COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml"
+
+    cfg = get_auto_cfg(model_path, config_file)
+    demo = VisualizationDemo(cfg)
+
+    video_input = "/home/chli/videos/robot-2.mp4"
+    output = "/home/chli/videos/robot-2_semantic.mp4"
     video = cv2.VideoCapture(video_input)
     width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
     frames_per_second = video.get(cv2.CAP_PROP_FPS)
     num_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
-    basename = os.path.basename(video_input)
     output_fname = output
     assert not os.path.isfile(output_fname), output_fname
     output_file = cv2.VideoWriter(
         filename=output_fname,
-        # some installation of opencv may not support x264 (due to its license),
-        # you can try other format (e.g. MPEG)
         fourcc=cv2.VideoWriter_fourcc(*"MP4V"),
         fps=float(frames_per_second),
         frameSize=(width, height),
@@ -66,10 +96,6 @@ def demo_detect_video():
     assert os.path.isfile(video_input)
     for vis_frame in tqdm.tqdm(demo.run_on_video(video), total=num_frames):
         output_file.write(vis_frame)
-        cv2.namedWindow(basename, cv2.WINDOW_NORMAL)
-        cv2.imshow(basename, vis_frame)
-        if cv2.waitKey(1) == 27:
-            break  # esc to quit
     video.release()
     output_file.release()
     cv2.destroyAllWindows()
