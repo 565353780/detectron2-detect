@@ -1,33 +1,12 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
 
-import multiprocessing as mp
-import numpy as np
 import os
-import tempfile
-import warnings
 import cv2
 import tqdm
 
 from detectron2.config import get_cfg
-from detectron2.data.detection_utils import read_image
 
 from predictor import VisualizationDemo
-
-def test_opencv_video_format(codec, file_ext):
-    with tempfile.TemporaryDirectory(prefix="video_format_test") as dir:
-        filename = os.path.join(dir, "test_file" + file_ext)
-        writer = cv2.VideoWriter(
-            filename=filename,
-            fourcc=cv2.VideoWriter_fourcc(*codec),
-            fps=float(30),
-            frameSize=(10, 10),
-            isColor=True,
-        )
-        [writer.write(np.zeros((10, 10, 3), np.uint8)) for _ in range(30)]
-        writer.release()
-        if os.path.isfile(filename):
-            return True
-        return False
 
 def get_auto_cfg(model_path, config_file, confidence_threshold=0.5):
     cfg = get_cfg()
@@ -43,13 +22,12 @@ def demo_detect_image():
     model_path = "/home/chli/.ros/model_final_a3ec72.pkl"
     config_file = "/home/chli/.ros/configs/COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml"
 
-    mp.set_start_method("spawn", force=True)
     cfg = get_auto_cfg(model_path, config_file)
     demo = VisualizationDemo(cfg)
 
     path = "/home/chli/baidu/car_dataset/images/1.jpg"
     out_filename = "/home/chli/baidu/test.jpg"
-    img = read_image(path, format="BGR")
+    img = cv2.imread(path)
     predictions, visualized_output = demo.run_on_image(img)
     visualized_output.save(out_filename)
     basename = os.path.basename(path)
@@ -63,7 +41,6 @@ def demo_detect_video():
     model_path = "/home/chli/.ros/model_final_a3ec72.pkl"
     config_file = "/home/chli/.ros/configs/COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml"
 
-    mp.set_start_method("spawn", force=True)
     cfg = get_auto_cfg(model_path, config_file)
     demo = VisualizationDemo(cfg)
 
@@ -75,18 +52,13 @@ def demo_detect_video():
     frames_per_second = video.get(cv2.CAP_PROP_FPS)
     num_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
     basename = os.path.basename(video_input)
-    codec, file_ext = (
-        ("x264", ".mkv") if test_opencv_video_format("x264", ".mkv") else ("mp4v", ".mp4")
-    )
-    if codec == ".mp4v":
-        warnings.warn("x264 codec not available, switching to mp4v")
     output_fname = output
     assert not os.path.isfile(output_fname), output_fname
     output_file = cv2.VideoWriter(
         filename=output_fname,
         # some installation of opencv may not support x264 (due to its license),
         # you can try other format (e.g. MPEG)
-        fourcc=cv2.VideoWriter_fourcc(*codec),
+        fourcc=cv2.VideoWriter_fourcc(*"MP4V"),
         fps=float(frames_per_second),
         frameSize=(width, height),
         isColor=True,
