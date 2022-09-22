@@ -19,13 +19,13 @@ def get_auto_cfg(model_path, config_file, confidence_threshold=0.5):
     return cfg
 
 def demo_detect_image():
-    model_path = "/home/chli/.ros/model_final_a3ec72.pkl"
-    config_file = "/home/chli/.ros/configs/COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml"
+    model_path = "/home/chli/chLi/detectron2/model_final_2d9806.pkl"
+    config_file = "/home/chli/github/detectron2/configs/COCO-InstanceSegmentation/mask_rcnn_X_101_32x8d_FPN_3x.yaml"
 
     cfg = get_auto_cfg(model_path, config_file)
     demo = VisualizationDemo(cfg)
 
-    path = "/home/chli/baidu/car_dataset/images/1.jpg"
+    path = "/home/chli/chLi/NeRF/ustc_niu/images/image_10.png"
     img = cv2.imread(path)
     _, visualized_output = demo.run_on_image(img)
     basename = os.path.basename(path)
@@ -102,5 +102,6 @@ def demo_save_video():
     return True
 
 if __name__ == "__main__":
-    demo_save_video()
+    demo_detect_image()
+    #  demo_save_video()
 
