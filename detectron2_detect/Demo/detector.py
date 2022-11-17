@@ -9,11 +9,10 @@ from detectron2_detect.Module.detector import Detector
 def demo():
     #  model_path = "/home/chli/chLi/detectron2/model_final_f96b26.pkl"
     #  config_name = "R_101_FPN_3x"
-    model_path = "/home/chli/chLi/detectron2/model_final_2d9806.pkl"
+    model_file_path = "/home/chli/chLi/detectron2/model_final_2d9806.pkl"
     config_name = "X_101_32x8d_FPN_3x"
 
-    detector = Detector()
-    detector.loadModel(model_path, config_name)
+    detector = Detector(model_file_path, config_name)
 
     image_path = "/home/chli/chLi/detectron2/test1.jpg"
     image = cv2.imread(image_path)
@@ -32,11 +31,10 @@ def demo():
 def demo_video():
     #  model_path = "/home/chli/chLi/detectron2/model_final_f96b26.pkl"
     #  config_name = "R_101_FPN_3x"
-    model_path = "/home/chli/chLi/detectron2/model_final_2d9806.pkl"
+    model_file_path = "/home/chli/chLi/detectron2/model_final_2d9806.pkl"
     config_name = "X_101_32x8d_FPN_3x"
 
-    detector = Detector()
-    detector.loadModel(model_path, config_name)
+    detector = Detector(model_file_path, config_name)
 
     video_path = "/home/chli/videos/robot-1.mp4"
 

@@ -9,18 +9,21 @@ from detectron2_detect.Config.configs import CONFIGS
 
 class Detector(object):
 
-    def __init__(self):
-        self.model_path = None
+    def __init__(self, model_file_path=None, config_name="X_101_32x8d_FPN_3x"):
+        self.model_file_path = None
         self.config_name = None
 
         #  self.confidence_threshold = 0.5
 
         self.cfg = None
         self.predictor = None
+
+        if None not in [model_file_path, config_name]:
+            self.loadModel(model_file_path, config_name)
         return
 
-    def loadModel(self, model_path, config_name):
-        self.model_path = model_path
+    def loadModel(self, model_file_path, config_name):
+        self.model_file_path = model_file_path
         self.config_name = config_name
 
         assert config_name in CONFIGS.keys()
@@ -30,7 +33,7 @@ class Detector(object):
         print("start loading model...", end="")
         self.cfg = get_cfg()
         self.cfg.merge_from_file(config_file)
-        self.cfg.MODEL.WEIGHTS = model_path
+        self.cfg.MODEL.WEIGHTS = model_file_path
 
         #  self.cfg.MODEL.RETINANET.SCORE_THRESH_TEST = self.confidence_threshold
         #  self.cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = self.confidence_threshold
