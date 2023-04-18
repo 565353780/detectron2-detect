@@ -9,11 +9,13 @@ from detectron2_detect.Config.configs import CONFIGS
 
 class Detector(object):
 
-    def __init__(self, model_file_path=None, config_name="X_101_32x8d_FPN_3x"):
-        self.model_file_path = None
-        self.config_name = None
-
-        #  self.confidence_threshold = 0.5
+    def __init__(self,
+                 model_file_path=None,
+                 config_name="X_101_32x8d_FPN_3x",
+                 confidence_threshold=None):
+        self.model_file_path = model_file_path
+        self.config_name = config_name
+        self.confidence_threshold = confidence_threshold
 
         self.cfg = None
         self.predictor = None
@@ -35,9 +37,10 @@ class Detector(object):
         self.cfg.merge_from_file(config_file)
         self.cfg.MODEL.WEIGHTS = model_file_path
 
-        #  self.cfg.MODEL.RETINANET.SCORE_THRESH_TEST = self.confidence_threshold
-        #  self.cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = self.confidence_threshold
-        #  self.cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = self.confidence_threshold
+        if self.confidence_threshold is not None:
+            self.cfg.MODEL.RETINANET.SCORE_THRESH_TEST = self.confidence_threshold
+            self.cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = self.confidence_threshold
+            self.cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = self.confidence_threshold
 
         self.cfg.freeze()
         self.predictor = DefaultPredictor(self.cfg)
